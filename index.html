@@ -6,24 +6,20 @@
     <title>سورة الكهف</title>
     <style>
         :root {
-            /* متغيرات الوضع النهاري */
             --bg-body: #f4ece1;
             --bg-container: #fcf8f2;
+            --bg-header: rgba(244, 236, 225, 0.95);
             --text-color: #333;
-            --shadow: rgba(0, 0, 0, 0.08);
-            /* فلتر الصورة في الوضع النهاري (لا يوجد تغيير) */
+            --shadow: rgba(0, 0, 0, 0.05);
             --img-filter: none;
         }
 
         [data-theme="dark"] {
-            /* متغيرات الوضع الليلي */
             --bg-body: #121212;
             --bg-container: #1e1e1e;
-            --text-color: #f4ece1; /* لون النص في لوحة التحكم */
-            --shadow: rgba(0, 0, 0, 0.5);
-            
-            /* السحر هنا: عكس ألوان الصورة (100% invert) */
-            /* هذا سيحول النص الأسود إلى أبيض */
+            --bg-header: rgba(18, 18, 18, 0.95);
+            --text-color: #f4ece1;
+            --shadow: rgba(0, 0, 0, 0.4);
             --img-filter: invert(100%);
         }
 
@@ -40,44 +36,51 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* لوحة التحكم الأزرار العائمة */
-        .control-panel {
+        /* شريط علوي ثابت للأزرار لضمان عدم تغطية النص */
+        .top-header {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--bg-header);
+            backdrop-filter: blur(5px);
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 10px var(--shadow);
             z-index: 1000;
+            transition: background-color 0.3s;
         }
 
         .btn {
-            background-color: #b58d53; /* لون ذهبي رمزي */
-            color: #121212; /* لون الأيقونة */
+            background-color: #b58d53;
+            color: #fff;
             border: none;
-            padding: 12px;
-            border-radius: 50%;
+            padding: 8px 18px;
+            border-radius: 20px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 18px;
-            width: 45px;
-            height: 45px;
+            font-size: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, background-color 0.3s;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, background-color 0.3s;
         }
         .btn:active { transform: scale(0.95); }
 
         [data-theme="dark"] .btn {
-            background-color: #f4ece1; /* تغيير لون الأزرار في الوضع الليلي لتبرز */
+            background-color: #f4ece1;
             color: #121212;
         }
 
+        /* حاوية الصورة */
         .container {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
-            padding: 20px 15px 80px 15px;
+            /* مسافة علوية 80 بكسل لتبتعد تماماً عن الشريط العلوي ولا تختفي خلفه أول آية */
+            padding: 80px 10px 40px 10px; 
             box-sizing: border-box;
             text-align: center;
         }
@@ -86,54 +89,72 @@
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px var(--shadow);
-            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 25px var(--shadow);
+            padding: 8px;
             box-sizing: border-box;
-            
-            /* تطبيق الفلتر الخاص بالصورة */
             filter: var(--img-filter);
-            
-            /* إضافة خاصية نعومة لتبديل الألوان */
             transition: filter 0.3s ease;
+        }
+
+        /* تحسينات ذكية جداً عند قلب الشاشة بشكل عرضي (أفقي) */
+        @media (orientation: landscape) {
+            .container {
+                max-width: 100%; /* تأخذ كامل العرض المتاح ليصبح الخط كبيراً جداً ومريحاً */
+                padding-top: 75px;
+            }
+            .quran-image {
+                border-radius: 0;
+                padding: 5px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="control-panel">
-        <button class="btn" id="themeBtn" title="تغيير الوضع">🌙</button>
-        <button class="btn" id="scrollBtn" title="تمرير تلقائي">▶️</button>
-    </div>
+    <header class="top-header">
+        <button class="btn" id="themeBtn">
+            <span id="themeIcon">🌙</span> <span id="themeText">الوضع الليلي</span>
+        </button>
+        <button class="btn" id="scrollBtn">
+            <span>▶️</span> التمرير التلقائي
+        </button>
+    </header>
 
     <div class="container">
         <img src="pictures.png" alt="سورة الكهف كاملة" class="quran-image">
     </div>
 
     <script>
-        // كود التبديل بين الوضع الليلي والنهاري (محدث بالأيقونات وحفظ التفضيل)
+        // نظام تبديل وحفظ الوضع
         const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
         const currentTheme = localStorage.getItem('theme');
 
-        // تطبيق الوضع المحفوظ سابقاً عند التحميل
         if (currentTheme) {
             document.documentElement.setAttribute('data-theme', currentTheme);
-            themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+            if (currentTheme === 'dark') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'الوضع النهاري';
+            }
         }
 
         themeBtn.addEventListener('click', () => {
             if (document.documentElement.getAttribute('data-theme') === 'dark') {
                 document.documentElement.removeAttribute('data-theme');
-                themeBtn.textContent = '🌙';
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'الوضع الليلي';
                 localStorage.setItem('theme', 'light');
             } else {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                themeBtn.textContent = '☀️';
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'الوضع النهاري';
                 localStorage.setItem('theme', 'dark');
             }
         });
 
-        // كود التمرير التلقائي البسيط (كما في الكود السابق)
+        // نظام التمرير التلقائي
         const scrollBtn = document.getElementById('scrollBtn');
         let scrollInterval = null;
         let isScrolling = false;
@@ -142,12 +163,12 @@
             if (!isScrolling) {
                 scrollInterval = setInterval(() => {
                     window.scrollBy(0, 1); 
-                }, 30); 
-                scrollBtn.textContent = '⏸️';
+                }, 28); // سرعة موزونة ومريحة جداً للقراءة العرضية والطولية
+                scrollBtn.innerHTML = '<span>⏸️</span> إيقاف مؤقت';
                 isScrolling = true;
             } else {
                 clearInterval(scrollInterval);
-                scrollBtn.textContent = '▶️';
+                scrollBtn.innerHTML = '<span>▶️</span> التمرير التلقائي';
                 isScrolling = false;
             }
         });
