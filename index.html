@@ -36,7 +36,7 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* شريط علوي ثابت للأزرار لضمان عدم تغطية النص */
+        /* شريط علوي ثابت للأزرار خارج منطقة النص */
         .top-header {
             position: fixed;
             top: 0;
@@ -75,12 +75,11 @@
             color: #121212;
         }
 
-        /* حاوية الصورة */
+        /* حاوية الصورة - تحافظ على حجم ثابت ومناسب في كل الأوضاع */
         .container {
-            max-width: 650px;
+            max-width: 600px; /* الحجم الأصلي المناسب والمريح */
             width: 100%;
-            /* مسافة علوية 80 بكسل لتبتعد تماماً عن الشريط العلوي ولا تختفي خلفه أول آية */
-            padding: 80px 10px 40px 10px; 
+            padding: 80px 15px 40px 15px; 
             box-sizing: border-box;
             text-align: center;
         }
@@ -96,22 +95,11 @@
             filter: var(--img-filter);
             transition: filter 0.3s ease;
         }
-
-        /* تحسينات ذكية جداً عند قلب الشاشة بشكل عرضي (أفقي) */
-        @media (orientation: landscape) {
-            .container {
-                max-width: 100%; /* تأخذ كامل العرض المتاح ليصبح الخط كبيراً جداً ومريحاً */
-                padding-top: 75px;
-            }
-            .quran-image {
-                border-radius: 0;
-                padding: 5px;
-            }
-        }
     </style>
 </head>
 <body>
 
+    <!-- الشريط العلوي الثابت -->
     <header class="top-header">
         <button class="btn" id="themeBtn">
             <span id="themeIcon">🌙</span> <span id="themeText">الوضع الليلي</span>
@@ -122,6 +110,7 @@
     </header>
 
     <div class="container">
+        <!-- تأكد من مطابقة اسم ملف الصورة المرفوع لديك (pictures.png أو pictures.jpg) -->
         <img src="pictures.png" alt="سورة الكهف كاملة" class="quran-image">
     </div>
 
@@ -154,16 +143,17 @@
             }
         });
 
-        // نظام التمرير التلقائي
+        // نظام التمرير التلقائي البطيء والموزون
         const scrollBtn = document.getElementById('scrollBtn');
         let scrollInterval = null;
         let isScrolling = false;
 
         scrollBtn.addEventListener('click', () => {
             if (!isScrolling) {
+                // تم زيادة الوقت الملي ثانية لتقليل السرعة وجعلها هادئة تماماً
                 scrollInterval = setInterval(() => {
                     window.scrollBy(0, 1); 
-                }, 28); // سرعة موزونة ومريحة جداً للقراءة العرضية والطولية
+                }, 55); 
                 scrollBtn.innerHTML = '<span>⏸️</span> إيقاف مؤقت';
                 isScrolling = true;
             } else {
